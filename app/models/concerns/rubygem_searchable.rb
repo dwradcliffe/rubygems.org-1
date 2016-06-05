@@ -12,6 +12,9 @@ module RubygemSearchable
     delegate :index_document, to: :__elasticsearch__
     delegate :update_document, to: :__elasticsearch__
 
+    # updates index when new version is pushed
+    after_commit -> { delay.update_document }, on: :update
+
     def as_indexed_json(_options = {})
       most_recent_version = versions.most_recent
       {

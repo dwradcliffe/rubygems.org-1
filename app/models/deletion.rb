@@ -9,6 +9,7 @@ class Deletion < ActiveRecord::Base
   after_create :remove_from_index
   after_commit :expire_api_memcached
   after_commit :remove_from_storage
+  after_commit :update_search_index
 
   attr_accessor :version
 
@@ -44,5 +45,9 @@ class Deletion < ActiveRecord::Base
     domain = "https://#{ENV['FASTLY_DOMAIN']}"
     Fastly.purge("#{domain}/gems/#{@version.full_name}.gem")
     Fastly.purge("#{domain}/quick/Marshal.4.8/#{@version.full_name}.gemspec.rz")
+  end
+
+  def update_search_index
+    @version.rubygem.delay.update_document
   end
 end
