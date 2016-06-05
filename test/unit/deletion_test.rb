@@ -9,6 +9,7 @@ class DeletionTest < ActiveSupport::TestCase
     @user = create(:user)
     Pusher.new(@user, gem_file).process
     @version = Version.last
+    Rubygem.import
   end
 
   should "be indexed" do
@@ -43,6 +44,19 @@ class DeletionTest < ActiveSupport::TestCase
     end
   end
 
+  should "enque job for updating ES index and update index" do
+    assert_difference 'Delayed::Job.count', 3 do
+      delete_gem
+    end
+
+    Delayed::Worker.new.work_off
+
+    response = Rubygem.__elasticsearch__.client.get index: "rubygems-#{Rails.env}",
+                                                    type: 'rubygem',
+                                                    id: @version.rubygem_id
+    assert_equal true, response['_source']['yanked']
+  end
+
   should "record version metadata" do
     deletion = Deletion.new(version: @version, user: @user)
     assert_nil deletion.rubygem
@@ -61,7 +75,7 @@ class DeletionTest < ActiveSupport::TestCase
 
   teardown do
     # This is necessary due to after_commit not cleaning up for us
-    [Rubygem, Version, User, Deletion].each(&:delete_all)
+    [Rubygem, Version, User, Deletion, Delayed::Job, GemDownload].each(&:delete_all)
   end
 
   private

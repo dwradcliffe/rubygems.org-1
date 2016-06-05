@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class RubygemSearchableTest < ActiveSupport::TestCase
+  self.use_transactional_fixtures = false # Disabled to test after_commit
+
   setup do
     Rubygem.__elasticsearch__.create_index! force: true
   end
@@ -132,5 +134,34 @@ class RubygemSearchableTest < ActiveSupport::TestCase
       suggestions = %w(keyword keywo keywordo)
       assert_equal suggestions, response.suggestions.terms
     end
+  end
+
+  context 'new version push' do
+    setup do
+      @rubygem = create(:rubygem)
+      create(:version, rubygem: @rubygem, summary: 'old summary')
+      import_and_refresh
+    end
+
+    should "enque job for updating ES index" do
+      assert_difference 'Delayed::Job.count', 1 do
+        create(:version, rubygem: @rubygem)
+      end
+    end
+
+    should "update rubygem index" do
+      create(:version, rubygem: @rubygem, summary: 'new summary')
+      Delayed::Worker.new.work_off
+
+      response = Rubygem.__elasticsearch__.client.get index: "rubygems-#{Rails.env}",
+                                                      type:  'rubygem',
+                                                      id:    @rubygem.id
+      assert_equal 'new summary', response['_source']['summary']
+    end
+  end
+
+  teardown do
+    # This is necessary due to after_commit not cleaning up for us
+    [Rubygem, Version, User, Deletion, Delayed::Job, GemDownload].each(&:delete_all)
   end
 end
