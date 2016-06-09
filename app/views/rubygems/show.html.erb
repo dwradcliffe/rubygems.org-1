@@ -73,6 +73,13 @@
             <div class="gem__owners">
               <%= links_to_owners(@rubygem) %>
             </div>
+          <% else %>
+            <h3 class="t-list__heading"><%= t '.orphaned' %>:</h3>
+            <ul class="t-list__items">
+              <li class="t-list__item">
+                <p><%= raw(t '.orphaned_support', support: link_to(t('.support'), "http://help.rubygems.org/")) %></p>
+              </li>
+            </ul>
           <% end %>
 
           <% if @latest_version.sha256.present? %>

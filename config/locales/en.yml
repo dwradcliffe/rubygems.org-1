@@ -113,6 +113,9 @@ en:
       list_multi_owner: You will lose access to these gem but other owners of the gem will continue to have access
     rubygem:
       owners_header: Owners
+    destroy:
+      successful_flash: Your account has been successfully deleted.
+      unsuccessful_flash: Something went wrong. Please try again after some time.
 
   rubygems:
     dependencies:
@@ -131,6 +134,9 @@ en:
       authors_header: Authors
       downloads_for_this_version: "For this version"
       owners_header: Owners
+      orphaned: Orphaned
+      support: Support
+      orphaned_support: This gem could be yours. Contact %{support} to find out how!
       links:
         header: Links
         home: Homepage

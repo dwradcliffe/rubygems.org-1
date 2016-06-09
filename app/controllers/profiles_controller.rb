@@ -35,10 +35,10 @@ class ProfilesController < ApplicationController
 
   def destroy
     if User.authenticate(current_user.email, params[:user][:password]) && current_user.destroy
-      flash[:notice] = "Your account has been successfully deleted."
+      flash[:notice] = t '.successful_flash'
       redirect_to_root
     else
-      flash[:notice] = "Something went wrong. Please try again after some time."
+      flash[:notice] = t '.unsuccessful_flash'
       redirect_to edit_profile_path
     end
   end
