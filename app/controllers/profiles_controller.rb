@@ -28,13 +28,18 @@ class ProfilesController < ApplicationController
     end
   end
 
+  def delete
+    @only_owner_gems = current_user.only_owner_gems
+    @multi_owner_gems = current_user.rubygems_downloaded - @only_owner_gems
+  end
+
   def destroy
-    if current_user.destroy
-      flash[:notice] = "Your account has been successfully deleted. Goodbye!"
+    if User.authenticate(current_user.email, params[:user][:password]) && current_user.destroy
+      flash[:notice] = "Your account has been successfully deleted."
       redirect_to_root
     else
-      flash[:notice] = "Something went wrong. Please try after some time."
-      render :edit
+      flash[:notice] = "Something went wrong. Please try again after some time."
+      redirect_to edit_profile_path
     end
   end
 

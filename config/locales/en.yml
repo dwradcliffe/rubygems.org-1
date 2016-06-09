@@ -101,6 +101,18 @@ en:
         link_text: gem commands
         reset: Reset my API key
         confirm_reset: Are you sure? This cannot be undone.
+      delete:
+        delete: Delete
+        delete_profile: Delete Profile
+        warning: Deleting your profile is an irreversible action. This can't be undone by contacting support. Please be certain!
+    delete:
+      title: Delete profile
+      confirm: Confirm
+      instructions: We are sorry to see you go. Type your password in the field below and confirm.
+      list_only_owner: These gems will be orphaned and will be allowed to be adopted by someone else
+      list_multi_owner: You will lose access to these gem but other owners of the gem will continue to have access
+    rubygem:
+      owners_header: Owners
 
   rubygems:
     dependencies:

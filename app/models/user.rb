@@ -103,4 +103,9 @@ class User < ActiveRecord::Base
   def total_rubygems_count
     rubygems.with_versions.count
   end
+
+  def only_owner_gems
+    rubygems.with_versions.where('rubygems.id IN (
+      SELECT rubygem_id FROM ownerships GROUP BY rubygem_id HAVING count(rubygem_id) = 1)')
+  end
 end
