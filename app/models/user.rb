@@ -10,9 +10,9 @@ class User < ActiveRecord::Base
   has_many :subscribed_gems, -> { order("name ASC") }, through: :subscriptions, source: :rubygem
 
   has_many :deletions
-  has_many :ownerships
-  has_many :subscriptions
-  has_many :web_hooks
+  has_many :ownerships, dependent: :destroy
+  has_many :subscriptions, dependent: :destroy
+  has_many :web_hooks, dependent: :destroy
 
   before_validation :regenerate_token, if: :email_changed?, on: :update
   before_create :generate_api_key

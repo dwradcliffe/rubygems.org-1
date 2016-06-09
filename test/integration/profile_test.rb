@@ -63,4 +63,16 @@ class ProfileTest < SystemTest
     visit profile_path("nick1")
     refute page.has_content?("Email Me")
   end
+
+  test "deleting profile" do
+    sign_in
+    visit profile_path("nick1")
+    click_link "Edit Profile"
+
+    click_button "Delete"
+    fill_in "Password", with: "secret123"
+    click_button "Confirm"
+
+    assert page.has_content? "Your account has been successfully deleted."
+  end
 end
