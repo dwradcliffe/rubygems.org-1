@@ -25,7 +25,8 @@ class Api::V1::OwnersController < Api::BaseController
   def destroy
     owner = @rubygem.owners.find_by_name(params[:email])
     if owner
-      if @rubygem.ownerships.find_by_user_id(owner.id).try(:destroy)
+      ownership = @rubygem.ownerships.find_by_user_id(owner.id)
+      if @rubygem.owners.count != 1 && ownership.try(:destroy)
         render text: "Owner removed successfully."
       else
         render text: 'Unable to remove owner.', status: :forbidden
