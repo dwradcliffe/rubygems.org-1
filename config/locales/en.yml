@@ -134,9 +134,6 @@ en:
       authors_header: Authors
       downloads_for_this_version: "For this version"
       owners_header: Owners
-      orphaned: Orphaned
-      support: Support
-      orphaned_support: This gem could be yours. Contact %{support} to find out how!
       links:
         header: Links
         home: Homepage
