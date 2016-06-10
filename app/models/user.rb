@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
 
   PERMITTED_ATTRS = [:bio, :email, :handle, :hide_email, :location, :password, :website].freeze
 
+  before_destroy :yank_gems
   has_many :rubygems, through: :ownerships
 
   has_many :subscribed_gems, -> { order("name ASC") }, through: :subscriptions, source: :rubygem
@@ -88,10 +89,6 @@ class User < ActiveRecord::Base
     generate_confirmation_token
   end
 
-  def generate_api_key
-    self.api_key = SecureRandom.hex(16)
-  end
-
   def total_downloads_count
     rubygems.to_a.sum(&:downloads)
   end
@@ -107,5 +104,18 @@ class User < ActiveRecord::Base
   def only_owner_gems
     rubygems.with_versions.where('rubygems.id IN (
       SELECT rubygem_id FROM ownerships GROUP BY rubygem_id HAVING count(rubygem_id) = 1)')
+  end
+
+  private
+
+  def generate_api_key
+    self.api_key = SecureRandom.hex(16)
+  end
+
+  def yank_gems
+    versions_to_yank = only_owner_gems.map(&:versions).flatten
+    versions_to_yank.each do |v|
+      deletions.create(version: v)
+    end
   end
 end
